@@ -22,8 +22,8 @@ def make_xlat(*args, **kwds):
 
 if __name__ == "__main__":
     
-    fileInputName = sys.argv[1]
-    #fileInputName = "t1.tex"
+    #fileInputName = sys.argv[1]
+    fileInputName = "Introduction.tex"
     fileOutName = fileInputName.split('.')[0]+"_trans.tex"
     
     fileIn  = open(fileInputName, "r") 
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     print("Starting hashing...")
      
     #replace commands like \begin{*}, \end{*} etc. with conntent in curly brackets which should not be changed
-    searchObj1 = re.findall( r"\\begin\{\w+\}|\\end\{\w+\}|\\usepackage\{\w+\}|\\newcommand\{\w+\}|\\include\{.*\}|\\input\{\w+\}|\\\w+\[.*\}|\%.*", fileStr)
+    searchObj1 = re.findall( r"\\begin\{\w+\}|\t|\\end\{\w+\}|\\usepackage\{\w+\}|\\newcommand\{\w+\}|\\include\{.*\}|\\input\{\w+\}|\\\w+\[.*\}|\%.*", fileStr)
     #random number for every found command
     list1 = [str(choice(range(11111, 99999, 1))) for x in searchObj1]
     #make a dictionary
@@ -61,8 +61,15 @@ if __name__ == "__main__":
     
     translated = ''
     for line in hashedText.splitlines():
-        #print(line)
-        translated = translated+pydeepl.translate(line, "DE", "EN")+'\n'
+        print(line)
+        if line == '\n':
+            translated = translated + '\n'
+        elif line == '\t':
+            translated = translated + '\t'
+        elif line == '':
+            translated = translated + '\n'
+        else: 
+            translated = translated+pydeepl.translate(line, "DE", "EN")+'\n'
     #print(translated)
     
     d1Inv = {val:key for (key, val) in d1.items()} #swap dictionary
