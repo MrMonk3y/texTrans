@@ -10,6 +10,7 @@ import sys
 import re
 import pydeepl
 from random import choice
+from tqdm import tqdm
 
 def make_xlat(*args, **kwds):
     adict = dict(*args, **kwds)
@@ -21,9 +22,8 @@ def make_xlat(*args, **kwds):
     return xlat
 
 if __name__ == "__main__":
-    
-    #fileInputName = sys.argv[1]
-    fileInputName = "Introduction.tex"
+    fileInputName = sys.argv[1]
+    #fileInputName = "Introduction.tex"
     fileOutName = fileInputName.split('.')[0]+"_trans.tex"
     
     fileIn  = open(fileInputName, "r") 
@@ -33,24 +33,24 @@ if __name__ == "__main__":
     
     print("Starting hashing...")
      
-    #replace commands like \begin{*}, \end{*} etc. with conntent in curly brackets which should not be changed
-    searchObj1 = re.findall( r"\\begin\{\w+\}|\t|\\end\{\w+\}|\\usepackage\{\w+\}|\\newcommand\{\w+\}|\\include\{.*\}|\\input\{\w+\}|\\\w+\[.*\}|\%.*", fileStr)
-    #random number for every found command
-    list1 = [str(choice(range(11111, 99999, 1))) for x in searchObj1]
-    #make a dictionary
+    #replace commands like \begin{*}, \end{*}, tabs etc. with hashes
+    searchObj1 = re.findall( r"\\begin\{\w+\}|\t|    |\r|\\end\{\w+\}|\\usepackage\{\w+\}|\\newcommand\{\w+\}|\\include\{.*\}|\\input\{\w+\}|\\\w+\[.*\}|\%.*", fileStr)
+    #random number for every found command + a prefix which hopefully doens't appear in text. Used to skip lines later, which don't need translation
+    list1 = ['X#X' + str(choice(range(1111, 9999, 1))) for x in searchObj1]
+    #make a dictionary out of hashes
     d1 = dict(zip(searchObj1,list1))
     translate = make_xlat(d1)
     hashedText = translate(fileStr)
     
     # replace all latex commands (starting with a backslash) with hashes
     searchObj2 = re.findall( r"\\\w+",hashedText)
-    #random number for every found command
-    list2 = [str(choice(range(11111, 99999, 1))) for x in searchObj2]
+    #random number  + prefix again
+    list2 = ['X#X' + str(choice(range(1111, 9999, 1))) for x in searchObj2]
     #make a dictionary
     d2 = dict(zip(searchObj2,list2))
     translate = make_xlat(d2)
     hashedText = translate(hashedText)
-    print(hashedText)
+#    print(hashedText)
     #fileOut.write(translate(hashedText))
     
     d1.update(d2) # combine dictionaries
@@ -60,22 +60,24 @@ if __name__ == "__main__":
     print("Hashing done. Starting translation...")
     
     translated = ''
-    for line in hashedText.splitlines():
-        print(line)
+    for line in tqdm(hashedText.splitlines()): #tqdm is a progressbar
+#        print(line)
+        if line.startswith("X#X") and len(line) == 7:
+            translated = translated + line + '\n'
+            continue            
         if line == '\n':
             translated = translated + '\n'
-        elif line == '\t':
-            translated = translated + '\t'
         elif line == '':
             translated = translated + '\n'
         else: 
             translated = translated+pydeepl.translate(line, "DE", "EN")+'\n'
-    #print(translated)
+#    translated = translated+pydeepl.translate(hashedText, "DE", "EN")
+#    print(translated)
     
     d1Inv = {val:key for (key, val) in d1.items()} #swap dictionary
     translate2 = make_xlat(d1Inv)
     fileStrOut = translate2(translated)
-    #print(fileStrOut)
+#    print(fileStrOut)
     
     fileOut.write(fileStrOut)
         
