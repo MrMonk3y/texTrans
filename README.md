@@ -13,7 +13,21 @@ Prerequisites
 Usage
 ------------
 
-    python textTrans <input File>
+    python textTrans.py -f <FROM> -t <TO> -i <input File>
+    
+    Example:
+    python texTrans.py -f DE -t EN - myfile.tex
 Output will be created as input_trans.tex
+
+ToDo
+----
+DeepL changed their API which causes problems sending the text
+
+- [ ] Fix pydeepl API or use something else
+
+
+Disclaimer
+----------
+Using this script could violate the ToS of DeepL. Therefore the purpose of this script is purely educational. Furthermore, the translation API can easily be switched to another API.
     
     
