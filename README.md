@@ -16,7 +16,7 @@ Usage
     python textTrans.py -f <FROM> -t <TO> -i <input File>
     
     Example:
-    python texTrans.py -f DE -t EN - myfile.tex
+    python texTrans.py -f DE -t EN -i myfile.tex
 Output will be created as input_trans.tex
 
 ToDo
